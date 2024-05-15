@@ -7,7 +7,7 @@ repository = "https://github.com/ria8651/alex"
 default-run = "alex"
 
 [dependencies]
-bevy = { version = "0.12", default-features = false, features = [
+bevy = { version = "0.13", default-features = false, features = [
     "bevy_asset",
     "bevy_winit",
     "bevy_core_pipeline",
@@ -17,13 +17,14 @@ bevy = { version = "0.12", default-features = false, features = [
     "bevy_sprite",
     "multi-threaded",
     "png",
+    "wayland",
 ] }
-bevy_egui = "0.23"
+bevy_egui = "0.27"
 fastanvil = "0.30"
 fastnbt = "2.4"
 serde_json = "1.0"
-bevy-inspector-egui = "0.21"
-wgpu = { version = "0.17", default-features = false }
+bevy-inspector-egui = "0.24"
+wgpu = { version = "0.19", default-features = false }
 bytemuck = "1.7"
 anyhow = "1.0"
 radsort = "0.1"

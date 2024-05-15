@@ -101,7 +101,10 @@ fn prepare_instance_buffers(
         let position = pos.as_vec3() - (1 << gpu_voxel_world.brickmap_depth - 1) as f32;
         let scale = (1 << gpu_voxel_world.brickmap_depth - depth) as f32;
         if depth > gpu_voxel_world.brickmap_depth {
-            error!("depth {} > {}. this is probably really bad", depth, gpu_voxel_world.brickmap_depth);
+            error!(
+                "depth {} > {}. this is probably really bad",
+                depth, gpu_voxel_world.brickmap_depth
+            );
             return;
         }
         let brick = gpu_voxel_world.brickmap[index] - BRICK_OFFSET;
@@ -154,7 +157,6 @@ fn queue_custom(
 
     for (view, mut transparent_phase) in &mut views {
         let view_key = msaa_key | MeshPipelineKey::from_hdr(view.hdr);
-        let rangefinder = view.rangefinder3d();
         for entity in &voxel_volumes {
             let Some(mesh_instance) = render_mesh_instances.get(&entity) else {
                 continue;
@@ -170,10 +172,9 @@ fn queue_custom(
                 entity,
                 pipeline,
                 draw_function: draw_custom,
-                distance: rangefinder
-                    .distance_translation(&mesh_instance.transforms.transform.translation),
                 batch_range: 0..1,
                 dynamic_offset: None,
+                asset_id: mesh_instance.mesh_asset_id,
             });
         }
     }
@@ -271,17 +272,20 @@ pub struct DrawVoxelPhase;
 
 impl<P: PhaseItem> RenderCommand<P> for DrawVoxelPhase {
     type Param = (SRes<RenderAssets<Mesh>>, SRes<RenderMeshInstances>);
-    type ViewWorldQuery = ();
-    type ItemWorldQuery = Read<InstanceBuffer>;
+    type ViewQuery = ();
+    type ItemQuery = Read<InstanceBuffer>;
 
     #[inline]
     fn render<'w>(
         item: &P,
         _view: (),
-        instance_buffer: &'w InstanceBuffer,
+        instance_buffer: std::option::Option<&'w InstanceBuffer>,
         (meshes, render_mesh_instances): SystemParamItem<'w, '_, Self::Param>,
         pass: &mut TrackedRenderPass<'w>,
     ) -> RenderCommandResult {
+        let Some(instance_buffer) = instance_buffer else {
+            return RenderCommandResult::Failure;
+        };
         let Some(mesh_instance) = render_mesh_instances.get(&item.entity()) else {
             return RenderCommandResult::Failure;
         };

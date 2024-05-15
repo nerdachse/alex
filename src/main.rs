@@ -3,6 +3,7 @@ use bevy::{
     prelude::*,
     render::{
         camera::RenderTarget,
+        render_asset::RenderAssetUsages,
         render_resource::*,
         texture::{ImageSampler, ImageSamplerDescriptor},
     },
@@ -55,6 +56,7 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
         TextureDimension::D2,
         &[0u8; 8],
         TextureFormat::Rgba16Float,
+        RenderAssetUsages::MAIN_WORLD, // Must be MAIN_WORLD because we access it later
     );
     render_texture.texture_descriptor.usage =
         TextureUsages::TEXTURE_BINDING | TextureUsages::RENDER_ATTACHMENT;
